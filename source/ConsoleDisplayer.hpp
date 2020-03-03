@@ -1,7 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <locale.h>
 #include <ncurses.h>
 
 class ConsoleDisplayer

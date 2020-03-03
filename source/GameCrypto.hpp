@@ -4,6 +4,7 @@
 #include <fstream>
 #include <random>
 #include <vector>
+#include <chrono>
 
 class GameCrypto
 {

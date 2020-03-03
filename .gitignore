@@ -1,3 +1,4 @@
 .ignore
 ./compile_and_run.sh
 ./cyberGame
+./source/*.gch

@@ -1,11 +1,11 @@
 #pragma once
 
 #include <iostream>
-#include <locale.h>
 #include <ncurses.h>
 #include <vector>
 #include <fstream>
 #include <random>
+#include <chrono>
 
 #include "GameObject.hpp"
 #include "GameCrypto.hpp"
