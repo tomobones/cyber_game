@@ -1,0 +1,4 @@
+Achieved:                     
+                              
+move:[arrowkeys][hjkl]        
+pause:[space] quit:[q] new:[n]

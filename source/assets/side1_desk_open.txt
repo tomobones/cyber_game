@@ -1,0 +1,9 @@
+As you take a look on the desk
+you find a cyphertext. Immedi-
+ately that freaky new method  
+called caesar encryption comes
+into your mind. Lets have a   
+try! Shift the letters of the 
+alphabet by [i]ncreasing and  
+[d]ecreasing the parameter to 
+decrypt this cypher text.     
