@@ -12,3 +12,7 @@ The only library I use beside the standard libraries is *ncurses*. Just make sur
 In both cases I use the *g++* compiler with the command:
 
         g++ -o cyberGame ./source/*.cpp -lncurses -std=c++11
+
+Run the game with
+
+        ./cyberGame
