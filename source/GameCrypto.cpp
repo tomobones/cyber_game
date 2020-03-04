@@ -8,7 +8,7 @@
 
 GameCrypto::GameCrypto()
 {
-    std::default_random_engine m_randomEngine(
+    m_randomEngine = std::default_random_engine(
         std::chrono::system_clock::now().time_since_epoch().count());
     std::uniform_int_distribution<int> distribution(1, 25);
 

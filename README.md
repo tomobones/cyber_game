@@ -1,6 +1,6 @@
 # Introduction
 
-This is a tiny PacMan inspired ASCII terminal game with a small Caesar Crypto Application. My intention for making this game is to show my C++ skills as I apply for a job as a programmer. Besides that I had a lot of fun while developing and playing!
+This is a tiny PacMan inspired ASCII terminal game with a small application of a Caesar Cypher. My intention for making this game is to show my C++ skills as I apply for a job as a programmer. Besides that I had a lot of fun while developing and playing!
 
 # Requirement
 
@@ -13,6 +13,6 @@ In both cases I use the *g++* compiler with the command:
 
         g++ -o cyberGame ./source/*.cpp -lncurses -std=c++11
 
-Run the game with
+On Linux or Mac you can run the game with
 
         ./cyberGame

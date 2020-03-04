@@ -16,7 +16,7 @@ Game::Game()
     m_gameAchievement = NO_ACHIEVEMENT;
     m_gameCrypto = GameCrypto();
     m_mainCharacter = GameObject(3, 0, 'O');
-    std::default_random_engine m_randomEngine(
+    m_randomEngine = std::default_random_engine(
         std::chrono::system_clock::now().time_since_epoch().count());
 
     for (int i = 0; i < NUMBER_STAFF; ++i)
