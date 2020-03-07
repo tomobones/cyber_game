@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     Game game;
     ConsoleDisplayer displayer;
 
-    const int staffVelocityMsec = 250;
+    const int staffVelocityMsec = 250; // round time
     bool gameLoopIsRunning = true;
     bool needToUpdateDisplay = false;
 
@@ -27,15 +27,14 @@ int main(int argc, char *argv[])
     for(PositionedChar &posChar : game.getPositionedCharsToAdd())
         displayer.addCharToGameSectionAt(posChar.y, posChar.x, posChar.c);
 
-    // set up time measure, initially measure start time for round
+    // set up time measurment, initially measure start time for round
     std::chrono::time_point<std::chrono::high_resolution_clock> start_frame, start_round, stop;
     start_round = std::chrono::high_resolution_clock::now();
 
     // game loop
     while(gameLoopIsRunning)
     {
-
-        // logic with respect to keyboard events
+        // keyboard events
         switch(getch())
         {
             case ' ':
@@ -84,7 +83,7 @@ int main(int argc, char *argv[])
         // measure stop time for round
         stop = std::chrono::high_resolution_clock::now();
 
-        // check roundtime
+        // check roundtime - in case move staff
         int roundTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_round).count();
         if (roundTime > staffVelocityMsec)
         {

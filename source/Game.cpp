@@ -1,21 +1,26 @@
 #include "Game.hpp"
 
+
 /**************************************************/
 /*             constructor, destructor            */
 /**************************************************/
+
 
 Game::Game()
 {
     const int numberOfStaff = 10;
 
     m_gameSetting = getStringFromFile("./source/assets/gameSetting.txt");
+
     m_gameMode = WALKING_PAUSED;
     m_gameAchievement = NO_ACHIEVEMENT;
+
     m_gameCrypto = GameCrypto();
     m_mainCharacter = GameObject(3, 0, 'O');
+
+    // set staff
     m_randomEngine = std::default_random_engine(
         std::chrono::system_clock::now().time_since_epoch().count());
-
     for (int i = 0; i < numberOfStaff; ++i)
     {
         Position staffPosition;
@@ -34,9 +39,11 @@ Game::~Game()
 {
 }
 
+
 /**************************************************/
 /*       public methods: set/get game state       */
 /**************************************************/
+
 
 void Game::updateGameTogglePause()
 {
@@ -54,7 +61,6 @@ void Game::updateGameMovingTo(GameObjectMove move)
     // wake up from pause mode
     if (m_gameMode == WALKING_PAUSED)
         m_gameMode = WALKING;
-
 
     if (m_gameMode != GAME_OVER)
     {
@@ -82,7 +88,7 @@ void Game::updateGameMovingTo(GameObjectMove move)
         {
             m_mainCharacter.setPosition(newPosition);
             m_mainCharacter.setFormerPosition(oldPosition);
-            m_gameMode = gameModeAccordingPosition(newPosition);
+            updateGameModeAndAchievementAccPos(newPosition);
             if (isGameOver())
                 m_gameMode = GAME_OVER;
         }
@@ -105,15 +111,15 @@ void Game::updateGameMovingStaff()
             {
                 case UP:
                     newPosition.x = oldPosition.x;
-                    newPosition.y = oldPosition.y + 1;
-                    break;
-                case RIGHT:
-                    newPosition.x = oldPosition.x;
                     newPosition.y = oldPosition.y - 1;
                     break;
-                case DOWN:
+                case RIGHT:
                     newPosition.x = oldPosition.x + 1;
                     newPosition.y = oldPosition.y;
+                    break;
+                case DOWN:
+                    newPosition.x = oldPosition.x;
+                    newPosition.y = oldPosition.y + 1;
                     break;
                 case LEFT:
                     newPosition.x = oldPosition.x - 1;
@@ -165,14 +171,14 @@ void Game::updateCryptoParameter(CryptoParameterUpdate update){
 
 std::vector<PositionedChar> Game::getPositionedCharsToAdd()
 {
-    m_positionedCharsToAdd.clear();
+    std::vector<PositionedChar> positionedCharsToAdd;
 
     PositionedChar posChar;
     posChar.c = m_mainCharacter.getChar();
     posChar.y = m_mainCharacter.getPosition().y;
     posChar.x = m_mainCharacter.getPosition().x;
 
-    m_positionedCharsToAdd.push_back(posChar);
+    positionedCharsToAdd.push_back(posChar);
 
     for (int i = 0; i < m_staffMembers.size(); i++)
     {
@@ -180,23 +186,23 @@ std::vector<PositionedChar> Game::getPositionedCharsToAdd()
         posCharStaff.c = m_staffMembers[i].getChar();
         posCharStaff.y = m_staffMembers[i].getPosition().y;
         posCharStaff.x = m_staffMembers[i].getPosition().x;
-        m_positionedCharsToAdd.push_back(posCharStaff);
+        positionedCharsToAdd.push_back(posCharStaff);
     }
 
-    return m_positionedCharsToAdd;
+    return positionedCharsToAdd;
 }
 
 std::vector<Position> Game::getPositionsToRemove()
 {
-    m_positionsToRemove.clear();
-    m_positionsToRemove.push_back(m_mainCharacter.getFormerPosition());
+    std::vector<Position> positionsToRemove;
+    positionsToRemove.push_back(m_mainCharacter.getFormerPosition());
 
     for (int i = 0; i < m_staffMembers.size(); i++)
     {
-        m_positionsToRemove.push_back(m_staffMembers[i].getFormerPosition());
+        positionsToRemove.push_back(m_staffMembers[i].getFormerPosition());
     }
 
-    return m_positionsToRemove;
+    return positionsToRemove;
 }
 
 std::string Game::getStringForSetting()
@@ -218,8 +224,8 @@ std::string Game::getStringForSide1Section()
             stringInfo = getStringFromFile("./source/assets/side1_desk_closed.txt");
         std::string stringAlph = m_gameCrypto.getAlphabet();
         std::string stringAlphMapped = m_gameCrypto.getAlphabetMapped();
-        std::string stringCypher = "CYPHER: " + m_gameCrypto.getCypherText();
-        std::string stringCypherMapped = "DCRYPT: " + m_gameCrypto.getCypherTextMapped();
+        std::string stringCypher = "CYPHR: " + m_gameCrypto.getCypherText();
+        std::string stringCypherMapped = "DCRPT: " + m_gameCrypto.getCypherTextMapped();
 
         stringComplete.replace(0, stringInfo.length(), stringInfo);
         stringComplete.replace(10*30, stringAlph.length(), stringAlph);
@@ -280,6 +286,7 @@ std::string Game::getStringForFullScreen()
 /**************************************************/
 /*                private methods                 */
 /**************************************************/
+
 
 bool Game::isColliding(Position position)
 {
@@ -356,34 +363,34 @@ std::string Game::getStringFromFile(const std::string fileName)
     return complete;
 }
 
-GameMode Game::gameModeAccordingPosition(Position position)
+void Game::updateGameModeAndAchievementAccPos(Position position)
 {
-    std::vector<char> characterAround;
-    characterAround.push_back(m_gameSetting[position.y * 40 + position.x + 1]);
-    characterAround.push_back(m_gameSetting[position.y * 40 + position.x - 1]);
-    characterAround.push_back(m_gameSetting[(position.y - 1) * 40 + position.x]);
-    characterAround.push_back(m_gameSetting[(position.y + 1) * 40 + position.x]);
+    std::vector<char> charsAroundPosition;
+    charsAroundPosition.push_back(m_gameSetting[position.y * 40 + position.x + 1]);
+    charsAroundPosition.push_back(m_gameSetting[position.y * 40 + position.x - 1]);
+    charsAroundPosition.push_back(m_gameSetting[(position.y - 1) * 40 + position.x]);
+    charsAroundPosition.push_back(m_gameSetting[(position.y + 1) * 40 + position.x]);
 
-    for (char character : characterAround)
+    for (char character : charsAroundPosition)
     {
         if (character == 'D')
-            // find logic to achieve KNOWS_CODE in in/decreaseParameter
-            return DESK;
+            // logic to achieve KNOWS_CODE -> see method updateCryptoParameter
+            m_gameMode = DESK;
         else if (character == 'S')
         {
             if (m_gameAchievement == KNOWS_CODE)
                 m_gameAchievement = KNOWS_PASSWD;
-            return SAFE;
+            m_gameMode = SAFE;
         }
         else if (character == 'T')
         {
             if (m_gameAchievement == KNOWS_PASSWD)
             {
                 m_gameAchievement = LOGGED_IN_CONSOLE;
-                return GAME_OVER;
+                m_gameMode = GAME_OVER;
             }
-            return TERMINAL;
+            m_gameMode = TERMINAL;
         }
     }
-    return WALKING;
+    m_gameMode = WALKING;
 }

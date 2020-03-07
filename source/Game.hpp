@@ -51,39 +51,28 @@ public:
 
     Game();
     ~Game();
-
     void updateGameTogglePause();
     void updateGameMovingTo(GameObjectMove move);
     void updateGameMovingStaff();
-
     GameMode getGameMode();
     GameAchievement getGameAchievement();
-
     std::string getStringForSetting();
     std::string getStringForSide1Section();
     std::string getStringForSide2Section();
     std::string getStringForFullScreen();
     std::vector<PositionedChar> getPositionedCharsToAdd();
     std::vector<Position> getPositionsToRemove();
-
     void updateCryptoParameter(CryptoParameterUpdate update);
 
 private:
 
     std::string m_gameSetting;
-
     GameObject m_mainCharacter;
     GameCrypto m_gameCrypto;
     std::vector<GameObject> m_staffMembers;
-
-    std::vector<Position> m_positionsToRemove;
-    std::vector<PositionedChar> m_positionedCharsToAdd;
-    std::default_random_engine m_randomEngine;
-
     GameMode m_gameMode;
     GameAchievement m_gameAchievement;
-
-
+    std::default_random_engine m_randomEngine;
 
     bool isColliding(Position position);
     bool isCollidingWithStaff(Position position);
@@ -91,5 +80,5 @@ private:
     bool isGameOver();
     bool haveContact(Position pos1, Position pos2);
     std::string getStringFromFile(const std::string fileName);
-    GameMode gameModeAccordingPosition(Position position);
+    void updateGameModeAndAchievementAccPos(Position position);
 };
