@@ -16,18 +16,17 @@ int main(int argc, char *argv[])
     Game game;
     ConsoleDisplayer displayer;
 
+    // start screen
     displayer.displayFullScreen(game.getStringForFullScreen());
     getchar();
 
-    // initial display
+    // initial game screen
     displayer.emptyFullScreen();
     displayer.displayGameSection(game.getStringForSetting());
-    displayer.displaySide1Section(game.getStringForSide1Section());
-    displayer.displaySide2Section(game.getStringForSide2Section());
 
     for(Position &pos : game.getPositionsToRemove())
         displayer.removeCharFromGameSectionAt(pos.y, pos.x);
-    for(PositionedCharacter &posChar : game.getPositionedCharactersToAdd())
+    for(PositionedChar &posChar : game.getPositionedCharsToAdd())
         displayer.addCharToGameSectionAt(posChar.y, posChar.x, posChar.c);
 
     // set up time measure, initially measure start time for round
@@ -37,87 +36,52 @@ int main(int argc, char *argv[])
     // game loop
     while(gameLoopIsRunning)
     {
-        // reset update variable for this loop
-        needToUpdateDisplay = false;
-
         // measure start time for frame
         start_frame = std::chrono::high_resolution_clock::now();
 
-        // logic for keyboard events
+        // logic with respect to keyboard events
         switch(getch())
         {
             case ' ':
-                if (game.getGameMode() == WALKING)
-                    game.setGameMode(WALKING_PAUSED);
-                else if (game.getGameMode() == WALKING_PAUSED)
-                    game.setGameMode(WALKING);
+                game.updateGameTogglePause();
                 break;
             case 'q':
                 gameLoopIsRunning = false;
                 break;
             case 'h':
             case 68:
-                if (game.getGameMode() == WALKING_PAUSED)
-                    game.setGameMode(WALKING);
-                if (game.getGameMode() != GAME_OVER)
-                {
-                    game.updateGameMovingLeft();
-                    needToUpdateDisplay = true;
-                }
+                game.updateGameMovingTo(LEFT);
+                needToUpdateDisplay = true;
                 break;
             case 'j':
             case 66:
-                if (game.getGameMode() == WALKING_PAUSED)
-                    game.setGameMode(WALKING);
-                if (game.getGameMode() != GAME_OVER)
-                {
-                    game.updateGameMovingDown();
-                    needToUpdateDisplay = true;
-                }
+                game.updateGameMovingTo(DOWN);
+                needToUpdateDisplay = true;
                 break;
             case 'k':
             case 65:
-                if (game.getGameMode() == WALKING_PAUSED)
-                    game.setGameMode(WALKING);
-                if (game.getGameMode() != GAME_OVER)
-                {
-                    game.updateGameMovingUp();
-                    needToUpdateDisplay = true;
-                }
+                game.updateGameMovingTo(UP);
+                needToUpdateDisplay = true;
                 break;
             case 'l':
             case 67:
-                if (game.getGameMode() == WALKING_PAUSED)
-                    game.setGameMode(WALKING);
-                if (game.getGameMode() != GAME_OVER)
-                {
-                    game.updateGameMovingRight();
-                    needToUpdateDisplay = true;
-                }
+                game.updateGameMovingTo(RIGHT);
+                needToUpdateDisplay = true;
                 break;
             case 'n':
-                // if (game.getGameMode() == GAME_OVER || game.getGameAchievement() == LOGGED_IN_CONSOLE)
-                // {
-                    displayer.emptyFullScreen();
-                    displayer.displayGameSection(game.getStringForSetting());
-                    displayer.displaySide1Section(game.getStringForSide1Section());
-                    displayer.displaySide2Section(game.getStringForSide2Section());
-                    game = Game();
-                // }
+                displayer.emptyFullScreen();
+                displayer.displayGameSection(game.getStringForSetting());
+                displayer.displaySide1Section(game.getStringForSide1Section());
+                displayer.displaySide2Section(game.getStringForSide2Section());
+                game = Game();
                 break;
             case 'd':
-                if (game.getGameMode() == DESK)
-                {
-                    game.decreaseCryptoParameter();
-                    needToUpdateDisplay = true;
-                }
+                game.updateCryptoParameter(DECREASE);
+                needToUpdateDisplay = true;
                 break;
             case 'i':
-                if (game.getGameMode() == DESK)
-                {
-                    game.increaseCryptoParameter();
-                    needToUpdateDisplay = true;
-                }
+                game.updateCryptoParameter(INCREASE);
+                needToUpdateDisplay = true;
                 break;
         }
 
@@ -128,8 +92,7 @@ int main(int argc, char *argv[])
         int roundTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_round).count();
         if (roundTime > staffVelocityMsec)
         {
-            if (game.getGameMode() == WALKING)
-                game.updateGameMovingStaff();
+            game.updateGameMovingStaff();
             needToUpdateDisplay = true;
             start_round = std::chrono::high_resolution_clock::now();
         }
@@ -137,21 +100,21 @@ int main(int argc, char *argv[])
         // update display after event: round timeout, keyboard input
         if (needToUpdateDisplay)
         {
-            displayer.displaySide1Section(game.getStringForSide1Section());
-            displayer.displaySide2Section(game.getStringForSide2Section());
-
-            for(Position pos : game.getPositionsToRemove())
-                displayer.removeCharFromGameSectionAt(pos.y, pos.x);
-            for(PositionedCharacter posChar : game.getPositionedCharactersToAdd())
-                displayer.addCharToGameSectionAt(posChar.y, posChar.x, posChar.c);
-
             if(game.getGameMode() == GAME_OVER)
             {
-                if(game.getGameAchievement() == LOGGED_IN_CONSOLE)
-                    displayer.displayFullScreen(game.getStringForFullScreen());
-                else
-                    displayer.displayFullScreen(game.getStringForFullScreen());
+                displayer.displayFullScreen(game.getStringForFullScreen());
             }
+            else
+            {
+                displayer.displaySide1Section(game.getStringForSide1Section());
+                displayer.displaySide2Section(game.getStringForSide2Section());
+
+                for(Position pos : game.getPositionsToRemove())
+                    displayer.removeCharFromGameSectionAt(pos.y, pos.x);
+                for(PositionedChar posChar : game.getPositionedCharsToAdd())
+                    displayer.addCharToGameSectionAt(posChar.y, posChar.x, posChar.c);
+            }
+            needToUpdateDisplay = false;
         }
 
         // check frame time and fill up to minimal frame time to get smooth motion

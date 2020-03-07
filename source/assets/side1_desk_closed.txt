@@ -2,7 +2,7 @@ Yay! You solved this mystery!
 go to the safe and get the    
 password for the terminal!    
                               
-Shift the letters of the      
-alphabet by [i]ncreasing and  
-[d]ecreasing the parameter to 
-decrypt this cypher text.
+                              
+                              
+                              
+                              

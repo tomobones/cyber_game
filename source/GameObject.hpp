@@ -16,10 +16,10 @@ public:
     Position getFormerPosition();
     void setPosition(Position actualPosition);
     void setFormerPosition(Position formerPosition);
-    char getCharacter();
+    char getChar();
 
 private:
     Position m_position;
     Position m_formerPosition;
-    char m_character;
+    char m_char;
 };

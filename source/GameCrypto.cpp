@@ -52,16 +52,12 @@ std::string GameCrypto::getAlphabetMapped()
     return tranformStringWithParamter(m_alphabet, m_parameterDecrypt);
 }
 
-void GameCrypto::increaseParameter()
+void GameCrypto::updateParameter(CryptoParameterUpdate update)
 {
-    m_parameterDecrypt++;
-    m_parameterDecrypt = moduloCalc(m_parameterDecrypt, 26);
-
-}
-
-void GameCrypto::decreaseParameter()
-{
-    m_parameterDecrypt--;
+    if (update == INCREASE)
+        m_parameterDecrypt++;
+    else if (update == DECREASE)
+        m_parameterDecrypt--;
     m_parameterDecrypt = moduloCalc(m_parameterDecrypt, 26);
 }
 

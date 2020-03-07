@@ -14,7 +14,7 @@ GameObject::GameObject()
     m_formerPosition.y = 3;
     m_formerPosition.x = 0;
 
-    m_character = 'O';
+    m_char = 'O';
 }
 
 GameObject::GameObject(int y, int x, char c)
@@ -25,7 +25,7 @@ GameObject::GameObject(int y, int x, char c)
     m_formerPosition.y = y;
     m_formerPosition.x = x;
 
-    m_character = c;
+    m_char = c;
 }
 
 GameObject::~GameObject()
@@ -61,7 +61,7 @@ void GameObject::setFormerPosition(Position formerPosition)
     m_formerPosition.y = formerPosition.y;
 }
 
-char GameObject::getCharacter()
+char GameObject::getChar()
 {
-    return m_character;
+    return m_char;
 }

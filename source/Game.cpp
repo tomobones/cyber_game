@@ -1,16 +1,13 @@
 #include "Game.hpp"
 
-
-#define NUMBER_STAFF 10
-
-
 /**************************************************/
 /*             constructor, destructor            */
 /**************************************************/
 
-
 Game::Game()
 {
+    const int numberOfStaff = 10;
+
     m_gameSetting = getStringFromFile("./source/assets/gameSetting.txt");
     m_gameMode = WALKING_PAUSED;
     m_gameAchievement = NO_ACHIEVEMENT;
@@ -19,7 +16,7 @@ Game::Game()
     m_randomEngine = std::default_random_engine(
         std::chrono::system_clock::now().time_since_epoch().count());
 
-    for (int i = 0; i < NUMBER_STAFF; ++i)
+    for (int i = 0; i < numberOfStaff; ++i)
     {
         Position staffPosition;
         do {
@@ -41,96 +38,41 @@ Game::~Game()
 /*       public methods: set/get game state       */
 /**************************************************/
 
+void Game::updateGameTogglePause()
+{
+    if (m_gameMode == WALKING)
+        m_gameMode = WALKING_PAUSED;
+    else if (m_gameMode == WALKING_PAUSED)
+        m_gameMode = WALKING;
+}
 
-void Game::updateGameMovingLeft()
+void Game::updateGameMovingTo(GameObjectMove move)
 {
     Position oldPosition = m_mainCharacter.getPosition();
     Position newPosition;
-    newPosition.x = oldPosition.x - 1;
-    newPosition.y = oldPosition.y;
-    if(!isColliding(newPosition))
+
+    // wake up from pause mode
+    if (m_gameMode == WALKING_PAUSED)
+        m_gameMode = WALKING;
+
+
+    if (m_gameMode != GAME_OVER)
     {
-        m_mainCharacter.setPosition(newPosition);
-        m_mainCharacter.setFormerPosition(oldPosition);
-        m_gameMode = gameModeAccordingPosition(newPosition);
-        if (isGameOver())
-            m_gameMode = GAME_OVER;
-    }
-}
-
-void Game::updateGameMovingRight()
-{
-    Position oldPosition = m_mainCharacter.getPosition();
-    Position newPosition;
-    newPosition.x = oldPosition.x + 1;
-    newPosition.y = oldPosition.y;
-    if(!isColliding(newPosition))
-    {
-        m_mainCharacter.setPosition(newPosition);
-        m_mainCharacter.setFormerPosition(oldPosition);
-        m_gameMode = gameModeAccordingPosition(newPosition);
-        if (isGameOver())
-            m_gameMode = GAME_OVER;
-    }
-}
-
-void Game::updateGameMovingUp()
-{
-    Position oldPosition = m_mainCharacter.getPosition();
-    Position newPosition;
-    newPosition.x = oldPosition.x;
-    newPosition.y = oldPosition.y - 1;
-    if(!isColliding(newPosition))
-    {
-        m_mainCharacter.setPosition(newPosition);
-        m_mainCharacter.setFormerPosition(oldPosition);
-        m_gameMode = gameModeAccordingPosition(newPosition);
-        if (isGameOver())
-            m_gameMode = GAME_OVER;
-    }
-}
-
-void Game::updateGameMovingDown()
-{
-    Position oldPosition = m_mainCharacter.getPosition();
-    Position newPosition;
-    newPosition.x = oldPosition.x;
-    newPosition.y = oldPosition.y + 1;
-    if(!isColliding(newPosition))
-    {
-        m_mainCharacter.setPosition(newPosition);
-        m_mainCharacter.setFormerPosition(oldPosition);
-        m_gameMode = gameModeAccordingPosition(newPosition);
-        if (isGameOver())
-            m_gameMode = GAME_OVER;
-    }
-}
-
-void Game::updateGameMovingStaff()
-{
-    std::uniform_int_distribution<int> distribution(0, 3);
-
-    for (int i = 0; i < m_staffMembers.size(); i++)
-    {
-        int randomNumber = distribution(m_randomEngine);
-        Position oldPosition = m_staffMembers[i].getPosition();
-        Position newPosition;
-
-        switch(randomNumber)
+        switch(move)
         {
-            case 0:
-                newPosition.x = oldPosition.x;
-                newPosition.y = oldPosition.y + 1;
-                break;
-            case 1:
+            case UP:
                 newPosition.x = oldPosition.x;
                 newPosition.y = oldPosition.y - 1;
                 break;
-            case 2:
+            case RIGHT:
                 newPosition.x = oldPosition.x + 1;
                 newPosition.y = oldPosition.y;
                 break;
-            case 3:
+            case DOWN:
+                newPosition.x = oldPosition.x;
+                newPosition.y = oldPosition.y + 1;
+                break;
+            case LEFT:
                 newPosition.x = oldPosition.x - 1;
                 newPosition.y = oldPosition.y;
                 break;
@@ -138,12 +80,56 @@ void Game::updateGameMovingStaff()
 
         if(!isColliding(newPosition))
         {
-            m_staffMembers[i].setPosition(newPosition);
-            m_staffMembers[i].setFormerPosition(oldPosition);
+            m_mainCharacter.setPosition(newPosition);
+            m_mainCharacter.setFormerPosition(oldPosition);
+            m_gameMode = gameModeAccordingPosition(newPosition);
+            if (isGameOver())
+                m_gameMode = GAME_OVER;
         }
     }
-    if (isGameOver())
-        m_gameMode = GAME_OVER;
+}
+
+void Game::updateGameMovingStaff()
+{
+    if (m_gameMode == WALKING)
+    {
+        std::uniform_int_distribution<GameObjectMove> distribution(UP, LEFT);
+
+        for (int i = 0; i < m_staffMembers.size(); i++)
+        {
+            int randomNumber = distribution(m_randomEngine);
+            Position oldPosition = m_staffMembers[i].getPosition();
+            Position newPosition;
+
+            switch(randomNumber)
+            {
+                case UP:
+                    newPosition.x = oldPosition.x;
+                    newPosition.y = oldPosition.y + 1;
+                    break;
+                case RIGHT:
+                    newPosition.x = oldPosition.x;
+                    newPosition.y = oldPosition.y - 1;
+                    break;
+                case DOWN:
+                    newPosition.x = oldPosition.x + 1;
+                    newPosition.y = oldPosition.y;
+                    break;
+                case LEFT:
+                    newPosition.x = oldPosition.x - 1;
+                    newPosition.y = oldPosition.y;
+                    break;
+            }
+
+            if(!isColliding(newPosition))
+            {
+                m_staffMembers[i].setPosition(newPosition);
+                m_staffMembers[i].setFormerPosition(oldPosition);
+            }
+        }
+        if (isGameOver())
+            m_gameMode = GAME_OVER;
+    }
 }
 
 GameMode Game::getGameMode()
@@ -151,19 +137,24 @@ GameMode Game::getGameMode()
     return m_gameMode;
 }
 
-void Game::setGameMode(GameMode gameMode)
-{
-    m_gameMode = gameMode;
-}
-
 GameAchievement Game::getGameAchievement()
 {
     return m_gameAchievement;
 }
 
-void Game::setGameAchievement(GameAchievement gameAchievement)
-{
-    m_gameAchievement = gameAchievement;
+
+/**************************************************/
+/*       public methods: crypto game              */
+/**************************************************/
+
+
+void Game::updateCryptoParameter(CryptoParameterUpdate update){
+    if (m_gameMode == DESK && m_gameAchievement == NO_ACHIEVEMENT)
+    {
+        m_gameCrypto.updateParameter(update);
+        if (m_gameCrypto.isSolved() && (m_gameAchievement == NO_ACHIEVEMENT))
+            m_gameAchievement = KNOWS_CODE;
+    }
 }
 
 
@@ -172,27 +163,27 @@ void Game::setGameAchievement(GameAchievement gameAchievement)
 /**************************************************/
 
 
-std::vector<PositionedCharacter> Game::getPositionedCharactersToAdd()
+std::vector<PositionedChar> Game::getPositionedCharsToAdd()
 {
-    m_positionedCharactersToAdd.clear();
+    m_positionedCharsToAdd.clear();
 
-    PositionedCharacter posChar;
-    posChar.c = m_mainCharacter.getCharacter();
+    PositionedChar posChar;
+    posChar.c = m_mainCharacter.getChar();
     posChar.y = m_mainCharacter.getPosition().y;
     posChar.x = m_mainCharacter.getPosition().x;
 
-    m_positionedCharactersToAdd.push_back(posChar);
+    m_positionedCharsToAdd.push_back(posChar);
 
     for (int i = 0; i < m_staffMembers.size(); i++)
     {
-        PositionedCharacter posCharStaff;
-        posCharStaff.c = m_staffMembers[i].getCharacter();
+        PositionedChar posCharStaff;
+        posCharStaff.c = m_staffMembers[i].getChar();
         posCharStaff.y = m_staffMembers[i].getPosition().y;
         posCharStaff.x = m_staffMembers[i].getPosition().x;
-        m_positionedCharactersToAdd.push_back(posCharStaff);
+        m_positionedCharsToAdd.push_back(posCharStaff);
     }
 
-    return m_positionedCharactersToAdd;
+    return m_positionedCharsToAdd;
 }
 
 std::vector<Position> Game::getPositionsToRemove()
@@ -284,25 +275,6 @@ std::string Game::getStringForFullScreen()
         return getStringFromFile("./source/assets/startScreen.txt");
 }
 
-
-/**************************************************/
-/*       public methods: crypto game              */
-/**************************************************/
-
-
-void Game::increaseCryptoParameter()
-{
-    m_gameCrypto.increaseParameter();
-    if (m_gameCrypto.isSolved() && (m_gameAchievement == NO_ACHIEVEMENT))
-        m_gameAchievement = KNOWS_CODE;
-}
-
-void Game::decreaseCryptoParameter()
-{
-    m_gameCrypto.decreaseParameter();
-    if (m_gameCrypto.isSolved() && (m_gameAchievement == NO_ACHIEVEMENT))
-        m_gameAchievement = KNOWS_CODE;
-}
 
 
 /**************************************************/

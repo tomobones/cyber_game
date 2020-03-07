@@ -6,6 +6,12 @@
 #include <vector>
 #include <chrono>
 
+enum CryptoParameterUpdate
+{
+    INCREASE = 0,
+    DECREASE = 1,
+};
+
 class GameCrypto
 {
 
@@ -18,8 +24,7 @@ public:
     std::string getCypherTextMapped();
     std::string getAlphabet();
     std::string getAlphabetMapped();
-    void increaseParameter();
-    void decreaseParameter();
+    void updateParameter(CryptoParameterUpdate update);
     bool isSolved();
 
 private:

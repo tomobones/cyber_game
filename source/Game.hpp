@@ -10,13 +10,22 @@
 #include "GameObject.hpp"
 #include "GameCrypto.hpp"
 
-struct PositionedCharacter
+struct PositionedChar
 {
     char c;
     int x;
     int y;
 };
 
+enum GameObjectMove
+{
+    UP = 0,
+    RIGHT = 1,
+    DOWN = 2,
+    LEFT = 3,
+};
+
+// game can be in severyl modes
 enum GameMode
 {
     WALKING = 0,
@@ -27,6 +36,7 @@ enum GameMode
     GAME_OVER = 5,
 };
 
+// game story is linear - has several "levels"
 enum GameAchievement
 {
     NO_ACHIEVEMENT = 0,
@@ -42,38 +52,38 @@ public:
     Game();
     ~Game();
 
-    void updateGameMovingLeft();
-    void updateGameMovingRight();
-    void updateGameMovingUp();
-    void updateGameMovingDown();
+    void updateGameTogglePause();
+    void updateGameMovingTo(GameObjectMove move);
     void updateGameMovingStaff();
 
     GameMode getGameMode();
-    void setGameMode(GameMode gameMode);
     GameAchievement getGameAchievement();
-    void setGameAchievement(GameAchievement gameAchievement);
 
     std::string getStringForSetting();
     std::string getStringForSide1Section();
     std::string getStringForSide2Section();
     std::string getStringForFullScreen();
-    std::vector<PositionedCharacter> getPositionedCharactersToAdd();
+    std::vector<PositionedChar> getPositionedCharsToAdd();
     std::vector<Position> getPositionsToRemove();
 
-    void increaseCryptoParameter();
-    void decreaseCryptoParameter();
+    void updateCryptoParameter(CryptoParameterUpdate update);
 
 private:
 
     std::string m_gameSetting;
+
     GameObject m_mainCharacter;
+    GameCrypto m_gameCrypto;
     std::vector<GameObject> m_staffMembers;
+
     std::vector<Position> m_positionsToRemove;
-    std::vector<PositionedCharacter> m_positionedCharactersToAdd;
+    std::vector<PositionedChar> m_positionedCharsToAdd;
     std::default_random_engine m_randomEngine;
+
     GameMode m_gameMode;
     GameAchievement m_gameAchievement;
-    GameCrypto m_gameCrypto;
+
+
 
     bool isColliding(Position position);
     bool isCollidingWithStaff(Position position);
