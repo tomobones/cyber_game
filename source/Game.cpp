@@ -374,13 +374,17 @@ void Game::updateGameModeAndAchievementAccPos(Position position)
     for (char character : charsAroundPosition)
     {
         if (character == 'D')
+        {
             // logic to achieve KNOWS_CODE -> see method updateCryptoParameter
             m_gameMode = DESK;
+            return;
+        }
         else if (character == 'S')
         {
             if (m_gameAchievement == KNOWS_CODE)
                 m_gameAchievement = KNOWS_PASSWD;
             m_gameMode = SAFE;
+            return;
         }
         else if (character == 'T')
         {
@@ -388,8 +392,10 @@ void Game::updateGameModeAndAchievementAccPos(Position position)
             {
                 m_gameAchievement = LOGGED_IN_CONSOLE;
                 m_gameMode = GAME_OVER;
+                return;
             }
             m_gameMode = TERMINAL;
+            return;
         }
     }
     m_gameMode = WALKING;
