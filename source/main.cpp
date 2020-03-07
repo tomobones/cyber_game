@@ -7,14 +7,12 @@
 
 int main(int argc, char *argv[])
 {
+    Game game;
+    ConsoleDisplayer displayer;
 
-    const int framesPerSecond = 60;
-    const int minimalDelayMsec = 1000 / framesPerSecond;
     const int staffVelocityMsec = 250;
     bool gameLoopIsRunning = true;
     bool needToUpdateDisplay = false;
-    Game game;
-    ConsoleDisplayer displayer;
 
     // start screen
     displayer.displayFullScreen(game.getStringForFullScreen());
@@ -36,8 +34,6 @@ int main(int argc, char *argv[])
     // game loop
     while(gameLoopIsRunning)
     {
-        // measure start time for frame
-        start_frame = std::chrono::high_resolution_clock::now();
 
         // logic with respect to keyboard events
         switch(getch())
@@ -85,7 +81,7 @@ int main(int argc, char *argv[])
                 break;
         }
 
-        // measure stop time for frame and round
+        // measure stop time for round
         stop = std::chrono::high_resolution_clock::now();
 
         // check roundtime
@@ -115,13 +111,6 @@ int main(int argc, char *argv[])
                     displayer.addCharToGameSectionAt(posChar.y, posChar.x, posChar.c);
             }
             needToUpdateDisplay = false;
-        }
-
-        // check frame time and fill up to minimal frame time to get smooth motion
-        int elapsedMsec = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start_frame).count();
-        if (elapsedMsec < minimalDelayMsec)
-        {
-            std::this_thread::sleep_for(stop - start_frame);
         }
     }
 
