@@ -99,7 +99,7 @@ void Game::updateGameMovingStaff()
 {
     if (m_gameMode == WALKING)
     {
-        std::uniform_int_distribution<GameObjectMove> distribution(UP, LEFT);
+        std::uniform_int_distribution<int> distribution(0, 3);
 
         for (int i = 0; i < m_staffMembers.size(); i++)
         {
@@ -109,19 +109,19 @@ void Game::updateGameMovingStaff()
 
             switch(randomNumber)
             {
-                case UP:
+                case 0:
                     newPosition.x = oldPosition.x;
                     newPosition.y = oldPosition.y - 1;
                     break;
-                case RIGHT:
+                case 1:
                     newPosition.x = oldPosition.x + 1;
                     newPosition.y = oldPosition.y;
                     break;
-                case DOWN:
+                case 2:
                     newPosition.x = oldPosition.x;
                     newPosition.y = oldPosition.y + 1;
                     break;
-                case LEFT:
+                case 3:
                     newPosition.x = oldPosition.x - 1;
                     newPosition.y = oldPosition.y;
                     break;
